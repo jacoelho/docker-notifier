@@ -3,8 +3,8 @@ package main
 import (
 	//"fmt"
 	dockerapi "github.com/fsouza/go-dockerclient"
-	"github.com/jacoelho/docker-notifier/worker"
 	"log"
+	"worker"
 )
 
 func main() {
@@ -18,9 +18,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	docker.AddEventListener(events)
+
 	w := worker.New(docker)
-	go w.Add("teste")
-	go w.Add("teste")
 
 	quit := make(chan struct{})
 

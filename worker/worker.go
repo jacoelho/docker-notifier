@@ -25,18 +25,14 @@ func New(docker *dockerapi.Client) *Worker {
 }
 
 func (w *Worker) Add(containerId string) {
-	//inspect docker
 	w.Lock()
 	defer w.Unlock()
 
-	fmt.Printf("->> %s\n", containerId)
+	container, _ := w.docker.InspectContainer(containerId)
+	name := container.Name[1:]
 
-	if w.Containers[containerId] != nil {
-		fmt.Printf("dupplicate")
-	}
-
-	w.Containers[containerId] = "cenas"
-	w.Alert.Notify(fmt.Sprintf("%s up", containerId))
+	w.Containers[containerId] = name
+	w.Alert.Notify(fmt.Sprintf("%s up", name))
 }
 
 func (w *Worker) Remove(containerId string) {
