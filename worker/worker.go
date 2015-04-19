@@ -29,6 +29,12 @@ func (w *Worker) Add(containerId string) {
 	w.Lock()
 	defer w.Unlock()
 
+	fmt.Printf("->> %s\n", containerId)
+
+	if w.Containers[containerId] != nil {
+		fmt.Printf("dupplicate")
+	}
+
 	w.Containers[containerId] = "cenas"
 	w.Alert.Notify(fmt.Sprintf("%s up", containerId))
 }

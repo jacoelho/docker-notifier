@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	docker, err := dockerapi.NewClient("unix:///tmp/docker.sock")
+	docker, err := dockerapi.NewClient("unix:///var/run/docker.sock")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -18,8 +18,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	quit := make(chan struct{})
 	w := worker.New(docker)
+	go w.Add("teste")
+	go w.Add("teste")
+
+	quit := make(chan struct{})
 
 	// Process Docker events
 	for msg := range events {
