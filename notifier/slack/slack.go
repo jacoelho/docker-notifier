@@ -3,7 +3,6 @@ package slack
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -12,29 +11,25 @@ type SlackIncomingHook struct {
 	Channel  string `json:"channel"`
 	Username string `json:"username"`
 	Text     string `json:"text"`
-	Icon     string `json:"icon_emoji"`
+	IconUrl  string `json:"icon_url"`
 }
 
 type Notifier struct {
-	Url      string
-	Username string
-	Icon     string
+	Url string
 }
 
-func New(url string, user string, icon string) *Notifier {
+func New(url string) *Notifier {
 	return &Notifier{
-		Url:      url,
-		Username: user,
-		Icon:     icon,
+		Url: url,
 	}
 }
 
 func (s *Notifier) Notify(text string) {
 	body := &SlackIncomingHook{
-		Channel:  "cenas",
-		Username: "cenas",
+		Channel:  "#integration-test",
+		Username: "docker-notifier",
 		Text:     text,
-		Icon:     "cenas",
+		IconUrl:  "https://raw.githubusercontent.com/jacoelho/docker-notifier/master/docker.png",
 	}
 
 	postJson, err := json.Marshal(body)
@@ -58,8 +53,6 @@ func (s *Notifier) Notify(text string) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("error post: %v\n", resp.StatusCode)
+		log.Printf("error post: %v\n", resp.StatusCode)
 	}
-
-	fmt.Printf("slack -> %s\n", text)
 }

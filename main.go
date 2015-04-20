@@ -1,14 +1,27 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	dockerapi "github.com/fsouza/go-dockerclient"
 	"log"
+	"os"
 	"worker"
 )
 
+func getopt(name, fallback string) string {
+	if env := os.Getenv(name); env != "" {
+		return env
+	}
+	return fallback
+}
+
 func main() {
-	docker, err := dockerapi.NewClient("unix:///var/run/docker.sock")
+	if len(os.Args) != 2 {
+		fmt.Printf("wrong number of arguments\n")
+		os.Exit(1)
+	}
+
+	docker, err := dockerapi.NewClient(getopt("DOCKER_HOST", "unix:///var/run/docker.sock"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,7 +33,7 @@ func main() {
 
 	docker.AddEventListener(events)
 
-	w := worker.New(docker)
+	w := worker.New(docker, os.Args[1])
 
 	quit := make(chan struct{})
 

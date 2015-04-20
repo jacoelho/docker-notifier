@@ -6,4 +6,4 @@ build:
 	docker build --no-cache -t $(NAME) .
 
 run:
-	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(NAME)
+	docker run --rm -it -v $$(pwd):/go/src -v /var/run/docker.sock:/var/run/docker.sock golang

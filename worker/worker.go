@@ -3,7 +3,8 @@ package worker
 import (
 	"fmt"
 	"github.com/jacoelho/docker-notifier/notifier"
-	"github.com/jacoelho/docker-notifier/notifier/slack"
+	//	"github.com/jacoelho/docker-notifier/notifier/slack"
+	"notifier/slack"
 	"sync"
 
 	dockerapi "github.com/fsouza/go-dockerclient"
@@ -16,11 +17,11 @@ type Worker struct {
 	Alert      notifier.Notifier
 }
 
-func New(docker *dockerapi.Client) *Worker {
+func New(docker *dockerapi.Client, uri string) *Worker {
 	return &Worker{
 		docker:     docker,
 		Containers: make(map[string]string),
-		Alert:      slack.New("http://google.com", "cenas", "cenas"),
+		Alert:      &slack.Notifier{Url: uri},
 	}
 }
 
