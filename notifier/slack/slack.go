@@ -8,15 +8,23 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	. "notifier"
 )
 
 type SlackIncomingHook struct {
-	Channel  string `json:"channel"`
-	Username string `json:"username"`
+	Channel     string             `json:"channel"`
+	Username    string             `json:"username"`
+	IconUrl     string             `json:"icon_url"`
+	Attachments []SlackAttachments `json:"attachments"`
+}
+
+type SlackAttachments struct {
+	Fallback string `json:"fallback"`
+	Color    string `json:"color"`
+	Title    string `json:"title"`
 	Text     string `json:"text"`
-	IconUrl  string `json:"icon_url"`
 }
 
 type SlackNotifier struct {
@@ -41,14 +49,26 @@ func (s *SlackNotifier) Init(parameters []string) {
 		fmt.Println("error: enter a channel name")
 		os.Exit(1)
 	}
+
+	if !(strings.HasPrefix(s.Channel, "#") != strings.HasPrefix(s.Channel, "@")) {
+		fmt.Println("invalid channel name")
+		os.Exit(1)
+	}
 }
 
 func (s *SlackNotifier) Notify(text string) {
 	body := &SlackIncomingHook{
 		Channel:  "#integration-test",
 		Username: s.Username,
-		Text:     text,
 		IconUrl:  "https://raw.githubusercontent.com/jacoelho/docker-notifier/master/docker.png",
+		Attachments: []SlackAttachments{
+			SlackAttachments{
+				Fallback: "mensagem",
+				Color:    "danger",
+				Title:    "titulo",
+				Text:     text,
+			},
+		},
 	}
 
 	postJson, err := json.Marshal(body)

@@ -46,7 +46,6 @@ func (w *Worker) Add(containerId string) {
 }
 
 func (w *Worker) Remove(containerId string) {
-	//inspect docker
 	w.Lock()
 	defer w.Unlock()
 
