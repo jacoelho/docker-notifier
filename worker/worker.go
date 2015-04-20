@@ -2,9 +2,8 @@ package worker
 
 import (
 	"fmt"
-	"github.com/jacoelho/docker-notifier/notifier"
-	//	"github.com/jacoelho/docker-notifier/notifier/slack"
-	"notifier/slack"
+	"notifier"
+	"os"
 	"sync"
 
 	dockerapi "github.com/fsouza/go-dockerclient"
@@ -14,14 +13,24 @@ type Worker struct {
 	sync.Mutex
 	docker     *dockerapi.Client
 	Containers map[string]string
-	Alert      notifier.Notifier
+	Alert      notifier.Plugin
 }
 
-func New(docker *dockerapi.Client, uri string) *Worker {
+func New(docker *dockerapi.Client, arguments []string) *Worker {
+
+	if _, ok := notifier.AvailableNotifiers[arguments[0]]; !ok {
+		fmt.Printf("invalid plugin\n")
+		os.Exit(1)
+	}
+
+	alert := notifier.AvailableNotifiers[arguments[0]]().(notifier.Plugin)
+
+	alert.Init(arguments)
+
 	return &Worker{
 		docker:     docker,
 		Containers: make(map[string]string),
-		Alert:      &slack.Notifier{Url: uri},
+		Alert:      alert,
 	}
 }
 

@@ -3,8 +3,13 @@ package slack
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	. "notifier"
 )
 
 type SlackIncomingHook struct {
@@ -14,20 +19,34 @@ type SlackIncomingHook struct {
 	IconUrl  string `json:"icon_url"`
 }
 
-type Notifier struct {
-	Url string
+type SlackNotifier struct {
+	Username string
+	Url      string
+	Channel  string
 }
 
-func New(url string) *Notifier {
-	return &Notifier{
-		Url: url,
+func (s *SlackNotifier) Init(parameters []string) {
+	flags := flag.NewFlagSet("slack", flag.ExitOnError)
+	flags.StringVar(&s.Username, "username", "docker-notifier", "docker user")
+	flags.StringVar(&s.Url, "url", "required", "slack incoming hook")
+	flags.StringVar(&s.Channel, "channel", "required", "slack channel")
+	flags.Parse(parameters[1:])
+
+	if s.Url == "required" {
+		fmt.Println("error: enter a slack incoming hook")
+		os.Exit(1)
+	}
+
+	if s.Channel == "required" {
+		fmt.Println("error: enter a channel name")
+		os.Exit(1)
 	}
 }
 
-func (s *Notifier) Notify(text string) {
+func (s *SlackNotifier) Notify(text string) {
 	body := &SlackIncomingHook{
 		Channel:  "#integration-test",
-		Username: "docker-notifier",
+		Username: s.Username,
 		Text:     text,
 		IconUrl:  "https://raw.githubusercontent.com/jacoelho/docker-notifier/master/docker.png",
 	}
@@ -55,4 +74,10 @@ func (s *Notifier) Notify(text string) {
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("error post: %v\n", resp.StatusCode)
 	}
+}
+
+func init() {
+	RegisterNotifier("slack", func() interface{} {
+		return new(SlackNotifier)
+	})
 }

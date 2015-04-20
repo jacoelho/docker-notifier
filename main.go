@@ -4,6 +4,8 @@ import (
 	"fmt"
 	dockerapi "github.com/fsouza/go-dockerclient"
 	"log"
+	//	"notifier"
+	_ "notifier/slack"
 	"os"
 	"worker"
 )
@@ -16,7 +18,7 @@ func getopt(name, fallback string) string {
 }
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) < 2 {
 		fmt.Printf("wrong number of arguments\n")
 		os.Exit(1)
 	}
@@ -33,7 +35,7 @@ func main() {
 
 	docker.AddEventListener(events)
 
-	w := worker.New(docker, os.Args[1])
+	w := worker.New(docker, os.Args[1:])
 
 	quit := make(chan struct{})
 
