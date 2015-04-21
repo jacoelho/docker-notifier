@@ -2,7 +2,8 @@ package worker
 
 import (
 	"fmt"
-	"notifier"
+	"github.com/jacoelho/docker-notifier/notifier"
+	"log"
 	"os"
 	"sync"
 
@@ -34,6 +35,21 @@ func New(docker *dockerapi.Client, arguments []string) *Worker {
 	}
 }
 
+func (w *Worker) RegisterRunning() {
+	containers, err := w.docker.ListContainers(dockerapi.ListContainersOptions{})
+	if err != nil {
+		log.Fatalf("Unable to register running containers: %v", err)
+	}
+	for _, container := range containers {
+		w.Lock()
+		c, _ := w.docker.InspectContainer(container.ID)
+		name := c.Name[1:]
+
+		w.Containers[container.ID] = name
+		w.Unlock()
+	}
+}
+
 func (w *Worker) Add(containerId string) {
 	w.Lock()
 	defer w.Unlock()
@@ -42,7 +58,7 @@ func (w *Worker) Add(containerId string) {
 	name := container.Name[1:]
 
 	w.Containers[containerId] = name
-	w.Alert.Notify(fmt.Sprintf("%s up", name))
+	w.Alert.NotifyUp(name)
 }
 
 func (w *Worker) Remove(containerId string) {
@@ -51,5 +67,5 @@ func (w *Worker) Remove(containerId string) {
 
 	containerName := w.Containers[containerId]
 	delete(w.Containers, containerId)
-	w.Alert.Notify(fmt.Sprintf("%s down", containerName))
+	w.Alert.NotifyDown(containerName)
 }

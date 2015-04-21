@@ -4,9 +4,9 @@ import (
 	"fmt"
 	dockerapi "github.com/fsouza/go-dockerclient"
 	_ "github.com/jacoelho/docker-notifier/notifier/slack"
+	"github.com/jacoelho/docker-notifier/worker"
 	"log"
 	"os"
-	"worker"
 )
 
 func getopt(name, fallback string) string {

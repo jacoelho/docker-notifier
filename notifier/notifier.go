@@ -10,5 +10,6 @@ func RegisterNotifier(name string, factory func() interface{}) {
 
 type Plugin interface {
 	Init([]string)
-	Notify(string)
+	NotifyUp(string)
+	NotifyDown(string)
 }

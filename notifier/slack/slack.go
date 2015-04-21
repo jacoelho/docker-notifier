@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	. "notifier"
+	. "github.com/jacoelho/docker-notifier/notifier"
 )
 
 type SlackIncomingHook struct {
@@ -56,16 +56,24 @@ func (s *SlackNotifier) Init(parameters []string) {
 	}
 }
 
-func (s *SlackNotifier) Notify(text string) {
+func (s *SlackNotifier) NotifyUp(containerName string) {
+	s.Notify(fmt.Sprintf("container %s is up", containerName), "good")
+}
+
+func (s *SlackNotifier) NotifyDown(containerName string) {
+	s.Notify(fmt.Sprintf("container %s is down", containerName), "danger")
+}
+
+func (s *SlackNotifier) Notify(text string, color string) {
 	body := &SlackIncomingHook{
-		Channel:  "#integration-test",
+		Channel:  s.Channel,
 		Username: s.Username,
 		IconUrl:  "https://raw.githubusercontent.com/jacoelho/docker-notifier/master/docker.png",
 		Attachments: []SlackAttachments{
 			SlackAttachments{
-				Fallback: "mensagem",
-				Color:    "danger",
-				Title:    "titulo",
+				Fallback: text,
+				Color:    color,
+				Title:    s.Username,
 				Text:     text,
 			},
 		},
