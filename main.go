@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	dockerapi "github.com/fsouza/go-dockerclient"
+	_ "github.com/jacoelho/docker-notifier/notifier/slack"
 	"log"
-	//	"notifier"
-	_ "notifier/slack"
 	"os"
 	"worker"
 )
@@ -36,8 +35,7 @@ func main() {
 	docker.AddEventListener(events)
 
 	w := worker.New(docker, os.Args[1:])
-
-	quit := make(chan struct{})
+	w.RegisterRunning()
 
 	// Process Docker events
 	for msg := range events {
@@ -50,6 +48,4 @@ func main() {
 			go w.Remove(msg.ID)
 		}
 	}
-
-	close(quit)
 }
