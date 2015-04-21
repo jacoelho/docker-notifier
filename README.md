@@ -7,5 +7,12 @@ At the moment only slack is supported.
 To run:
 
 ```shell
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock jacoelho/docker-notifier slack -channel=#mychannel -url=https://hooks.slack.com/services/xxxxxxxxxx
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \ 
+  jacoelho/docker-notifier slack \
+  -channel=#mychannel \
+  -url=https://hooks.slack.com/services/xxxxxxxxxx
 ```
+
+Screenshot:
+
+![screenshot](https://raw.githubusercontent.com/jacoelho/docker-notifier/master/docker-notifier.png)
