@@ -1,4 +1,4 @@
-NAME = notifier
+NAME = jacoelho/docker-notifier
 
 build:
 	docker build --no-cache -t $(NAME).dev -f Dockerfile.dev .
